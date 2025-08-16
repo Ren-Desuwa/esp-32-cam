@@ -82,7 +82,7 @@ bool initCamera() {
   s->set_colorbar(s, 0);
   s->set_aec2(s, 1);           // Auto exposure
   s->set_ae_level(s, 0);
-  s->set_whitebal(s, 0);       // Disable auto white balance
+  s->set_whitebal(s, 1);       // Disable auto white balance
   s->set_gain_ctrl(s, 0);      // Disable auto gain
   s->set_exposure_ctrl(s, 0);  // Disable auto exposure
 
@@ -119,5 +119,6 @@ void getImageDimensions(int* width, int* height) {
 void setFlash(bool on) {
   digitalWrite(FLASH_GPIO_NUM, on ? HIGH : LOW);
 }
+
 
 #endif // CAM_SETUP_H

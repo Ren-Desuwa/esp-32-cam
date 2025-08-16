@@ -147,4 +147,90 @@ public:
   }
 };
 
+// ========================================
+// USAGE EXAMPLES
+// ========================================
+
+/*
+// SENDER EXAMPLES:
+SimpleSerialSender sender(&Serial2);
+
+void setup() {
+  Serial.begin(115200);
+  sender.begin(115200);
+}
+
+void loop() {
+  // Send different types of data
+  sender.send(123);                    // Send integer
+  sender.send(45.67);                  // Send float
+  sender.send("Hello World");          // Send string
+  sender.send(true);                   // Send boolean (as 1/0)
+  
+  // Send comma-separated values
+  sender.send(10, ",");
+  sender.send(20, ",");
+  sender.send(30, ",");
+  sender.endTransmission();            // End with "END"
+  
+  // Send custom formatted string
+  String data = "R0,B1,100,200,300";
+  sender.sendString(data);
+  
+  delay(1000);
+}
+
+// RECEIVER EXAMPLES:
+SimpleSerialReceiver receiver(&Serial2);
+
+void setup() {
+  Serial.begin(115200);
+  receiver.begin(115200);
+}
+
+void loop() {
+  if (receiver.receiveLine()) {
+    String data = receiver.getString();
+    Serial.println("Received: " + data);
+    
+    // Check for specific values
+    if (receiver.equals("END")) {
+      Serial.println("Transmission ended");
+    }
+    
+    // Parse as different types
+    int int_val = receiver.getInt();
+    float float_val = receiver.getFloat();
+    
+    // Parse CSV data
+    String values[10];
+    int count = receiver.parseCSV(values, 10);
+    
+    Serial.printf("Parsed %d CSV values:\n", count);
+    for (int i = 0; i < count; i++) {
+      Serial.printf("  [%d]: %s\n", i, values[i].c_str());
+    }
+  }
+  
+  delay(10);
+}
+
+// RAW BYTES EXAMPLE:
+void sendRawData() {
+  uint8_t data[] = {0x01, 0x02, 0x03, 0x04};
+  sender.sendBytes(data, sizeof(data));
+}
+
+void receiveRawData() {
+  uint8_t buffer[100];
+  int bytes_received = receiver.receiveBytes(buffer, sizeof(buffer));
+  
+  Serial.printf("Received %d raw bytes\n", bytes_received);
+  for (int i = 0; i < bytes_received; i++) {
+    Serial.printf("0x%02X ", buffer[i]);
+  }
+  Serial.println();
+}
+*/
+
 #endif // SIMPLE_SERIAL_COMM_H

@@ -37,12 +37,12 @@ private:
     
     // RED (two ranges due to hue wraparound)
     color_map["RED"] = {
-      ColorThresholds(0, 5, 122, 255, 30, 255),
-      ColorThresholds(170, 179, 30, 255, 40, 255)
+      ColorThresholds(0, 10, 50, 255, 50, 255),
+      ColorThresholds(160, 179, 50, 255, 50, 255)
     };
     
     // GREEN
-    color_map["GREEN"] = {ColorThresholds(40, 80, 60, 255, 40, 140)};
+    color_map["GREEN"] = {ColorThresholds(40, 80, 50, 255, 50, 255)};
   }
   
 public:

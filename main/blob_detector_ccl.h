@@ -123,7 +123,7 @@ struct BlobStats {
 // ========================================
 
 inline std::vector<Blob> detectSingleColorCCL(const HSVImage& hsv, const DetectionRegion& region,
-                                              const std::string& color_name, int min_size = 30) {
+                                              const std::string& color_name, int min_size = 10) {
   if (!hsv.isValid() || !getColorManager().hasColor(color_name)) return {};
   
   const int region_width = region.width;
@@ -274,6 +274,38 @@ inline std::vector<RegionResults> detectBlobsStructured(
   return results;
 }
 
+// Legacy function - using explicit region vector (for backward compatibility)
+inline std::vector<RegionResults> detectBlobsStructured(
+    const HSVImage& hsv,
+    const std::vector<DetectionRegion>& regions,
+    const std::vector<std::string>& colors_to_detect,
+    bool multi_blob_per_color = true,
+    int min_size = 10) {
+  
+  std::vector<RegionResults> results;
+  results.reserve(regions.size());
+  
+  for (size_t region_idx = 0; region_idx < regions.size(); region_idx++) {
+    RegionResults region_result(static_cast<int>(region_idx));
+    const DetectionRegion& region = regions[region_idx];
+    
+    for (const std::string& color : colors_to_detect) {
+      std::vector<Blob> color_blobs = detectSingleColorCCL(hsv, region, color, min_size);
+      
+      if (!multi_blob_per_color && !color_blobs.empty()) {
+        auto largest = std::max_element(color_blobs.begin(), color_blobs.end(),
+          [](const Blob& a, const Blob& b) { return a.pixel_count < b.pixel_count; });
+        color_blobs = {*largest};
+      }
+      
+      region_result.getBlobsForColor(color) = std::move(color_blobs);
+    }
+    
+    results.push_back(std::move(region_result));
+  }
+  
+  return results;
+}
 
 // ========================================
 // CONVENIENCE FUNCTIONS
@@ -300,5 +332,28 @@ inline std::vector<RegionResults> detectSingleColorStructured(
   
   return detectBlobsStructured(hsv, region_set_name, {color}, multi_blob_per_color, min_size);
 }
+
+// Legacy functions - using explicit region vectors
+inline std::vector<RegionResults> detectAllColorsStructured(
+    const HSVImage& hsv,
+    const std::vector<DetectionRegion>& regions,
+    bool multi_blob_per_color = true,
+    int min_size = 10) {
+  
+  std::vector<std::string> all_colors = getColorManager().getAllColorNames();
+  return detectBlobsStructured(hsv, regions, all_colors, multi_blob_per_color, min_size);
+}
+
+inline std::vector<RegionResults> detectSingleColorStructured(
+    const HSVImage& hsv,
+    const std::vector<DetectionRegion>& regions,
+    const std::string& color,
+    bool multi_blob_per_color = true,
+    int min_size = 10) {
+  
+  return detectBlobsStructured(hsv, regions, {color}, multi_blob_per_color, min_size);
+}
+
+
 
 #endif // BLOB_DETECTOR_CCL_H
